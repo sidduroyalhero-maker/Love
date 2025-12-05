@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>For You 💌</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #ffe7c4 0, #f0c6aa 30%, #1a1a1a 100%);
+      color: #fff;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at top, rgba(0,0,0,0.5), #000);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1s ease;
+    }
+
+    .container {
+      position: relative;
+      max-width: 480px;
+      width: 90%;
+      padding: 32px 28px 40px;
+      border-radius: 24px;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+      text-align: center;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      opacity: 0.7;
+      margin-bottom: 6px;
+    }
+
+    .title {
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .highlight-name {
+      font-weight: 700;
+      background: linear-gradient(120deg, #ffd66b, #ffb347, #ffd9a0);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .description {
+      font-size: 0.98rem;
+      opacity: 0.9;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .envelope-wrapper {
+      margin: 10px auto 24px;
+      width: 180px;
+      height: 120px;
+      position: relative;
+      perspective: 800px;
+    }
+
+    .envelope-base {
+      position: absolute;
+      inset: 0;
+      border-radius: 14px;
+      background: linear-gradient(145deg, #7a5a27, #f8d58c);
+      box-shadow:
+        0 10px 25px rgba(0, 0, 0, 0.6),
+        inset 0 0 12px rgba(255, 255, 255, 0.3);
+      overflow: hidden;
+    }
+
+    .envelope-flap {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60%;
+      background: linear-gradient(160deg, #f5d18b, #a46b2e);
+      transform-origin: top center;
+      transform: rotateX(0deg);
+      transition: transform 1s ease;
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      box-shadow: 0 12px 18px rgba(0, 0, 0, 0.4);
+      z-index: 2;
+    }
+
+    .envelope-seal {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 20%, #fff6d2, #f0b13a, #8b5b15);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      color: #512b00;
+      font-weight: 700;
+    }
+
+    .letter-card {
+      position: absolute;
+      inset: 12px;
+      margin-inline: 18px;
+      background: #fff8ec;
+      border-radius: 12px;
+      box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.2),
+        0 0 0 1px rgba(255, 255, 255, 0.4);
+      transform: translateY(40px);
+      opacity: 0;
+      transition:
+        transform 1s cubic-bezier(0.19, 1, 0.22, 1),
+        opacity 1s ease;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      color: #5b3c10;
+      font-weight: 500;
+    }
+
+    .letter-card::before {
+      content: "💌";
+      margin-right: 8px;
+    }
+
+    .open-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 22px;
+      border-radius: 999px;
+      border: none;
+      font-size: 0.98rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: linear-gradient(120deg, #ffd26f, #f89b29);
+      color: #3b2200;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+    }
+
+    .open-btn span {
+      font-size: 1.1rem;
+    }
+
+    .open-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.7);
+      filter: brightness(1.05);
+    }
+
+    .open-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      font-size: 0.78rem;
+      opacity: 0.7;
+    }
+
+    /* Letter section */
+
+    .letter-wrapper {
+      margin-top: 28px;
+      text-align: left;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 1.3s ease, opacity 1.3s ease;
+    }
+
+    .letter {
+      background: rgba(255, 248, 236, 0.96);
+      border-radius: 18px;
+      padding: 20px 18px 24px;
+      color: #3c260b;
+      box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.75),
+        0 0 0 1px rgba(255, 255, 255, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .letter::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(
+        rgba(255, 255, 255, 0.28) 1px,
+        transparent 1px
+      );
+      background-size: 100% 22px;
+      pointer-events: none;
+      mix-blend-mode: soft-light;
+    }
+
+    .letter-header {
+      font-size: 0.95rem;
+      margin-bottom: 14px;
+    }
+
+    .letter-header span {
+      font-weight: 600;
+    }
+
+    .letter-body {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      white-space: pre-line;
+      position: relative;
+      z-index: 1;
+    }
+
+    .letter-footer {
+      margin-top: 18px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-align: right;
+      position: relative;
+      z-index: 1;
+    }
+
+    .heart-glow {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle, rgba(255, 99, 132, 0.5), transparent 70%);
+      top: -20px;
+      right: -20px;
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .open .overlay {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .open .envelope-flap {
+      transform: rotateX(-150deg);
+    }
+
+    .open .letter-card {
+      transform: translateY(-20px);
+      opacity: 1;
+    }
+
+    .open .letter-wrapper {
+      max-height: 600px;
+      opacity: 1;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 24px 18px 30px;
+      }
+      .title {
+        font-size: 1.4rem;
+      }
+      .letter {
+        padding: 18px 14px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay"></div>
+
+  <div class="container" id="card">
+    <div class="subtitle">Special for you</div>
+    <div class="title">
+      Hi <span class="highlight-name">[HER NAME]</span>,
+    </div>
+    <p class="description">
+      Someone has been carrying these words in their heart for a long time.
+      When you feel ready, open the letter below.
+    </p>
+
+    <div class="envelope-wrapper">
+      <div class="envelope-base"></div>
+      <div class="envelope-flap"></div>
+      <div class="letter-card">A letter from my heart to yours.</div>
+      <div class="envelope-seal">♥</div>
+    </div>
+
+    <button class="open-btn" id="openButton">
+      <span>💌</span> Open the letter
+    </button>
+
+    <div class="letter-wrapper" id="letterWrapper">
+      <div class="letter">
+        <div class="heart-glow"></div>
+        <div class="letter-header">
+          Dear <span>[HER NAME]</span>,
+        </div>
+        <div class="letter-body">
+          <!-- WRITE YOUR LOVE LETTER HERE -->
+          I do not know the exact moment it happened, but somewhere between our
+          random conversations, your smile, and the way you see the world,
+          you became very special to me.
+
+          I find myself thinking about you more than I ever admit, replaying
+          little moments in my head and wishing for more of them. You make
+          ordinary days feel lighter, and the idea of a future feels a lot
+          more beautiful when I imagine you in it.
+
+          I am not perfect, and I cannot promise that life will always be easy,
+          but I can promise this: if you let me, I will care for you deeply,
+          respect you, support your dreams, and stand by you in every season
+          of life.
+
+          So today, with all the courage I have, I want to ask you something
+          that my heart has been quietly whispering for a long time…
+
+          Will you be with me? Not just for today, not just for a moment,
+          but truly – as my person, as someone I can love openly and honestly.
+        </div>
+        <div class="letter-footer">
+          With all my heart,<br />
+          [YOUR NAME]
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      This page will always be here, just like my feelings for you.
+    </div>
+  </div>
+
+  <script>
+    const openButton = document.getElementById("openButton");
+    const card = document.getElementById("card");
+
+    openButton.addEventListener("click", () => {
+      card.classList.add("open");
+      openButton.disabled = true;
+      openButton.textContent = "Letter opened";
+    });
+  </script>
+</body>
+</html>
